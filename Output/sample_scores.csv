@@ -1,0 +1,11 @@
+business_id,name,latitude,longitude,categories,stars,dist_km,score,cf_score,geo_score,cat_score,cf_weight,geo_weight,cat_weight,cf_contribution,geo_contribution,cat_contribution,cf_contrib_pct,geo_contrib_pct,cat_contrib_pct
+5asvaAT-jDbOnCM3iPlScw,ReAnimator Coffee,39.9724323,-75.1410235,"Coffee & Tea, Food",4.5,1.09,0.7451,0.8516,0.8491,0.5,0.3,0.4,0.3,0.2555,0.3397,0.15,34.29,45.58,20.13
+4t3yeXmkrMaJruCWA0H8DA,Saxbys Temple Fox,39.980719982,-75.155526051,"Food, Coffee & Tea",4.0,0.53,0.7443,0.75,0.9233,0.5,0.3,0.4,0.3,0.225,0.3693,0.15,30.23,49.62,20.15
+LzgxfMu24HbJbUi1cCk70Q,Premium Steap,39.9565128,-75.1602477,"Coffee & Tea, Food",4.5,2.31,0.7329,1.0,0.7072,0.5,0.3,0.4,0.3,0.3,0.2829,0.15,40.94,38.6,20.47
+61RiTA-T02sU84FhoCLz_g,The Lola Bean,39.9710245,-75.134328,"Food, Coffee & Tea",4.5,1.68,0.726,0.8833,0.7776,0.5,0.3,0.4,0.3,0.265,0.311,0.15,36.5,42.84,20.66
+GEtK2S6zALXgsjKjK3abJw,Starbucks,39.954023,-75.148885,"Coffee & Tea, Food",3.0,2.52,0.7243,1.0,0.6856,0.5,0.3,0.4,0.3,0.3,0.2743,0.15,41.42,37.87,20.71
+RMRlzkMedvSjxFLN9cIJSw,Coffee House,39.9691333,-75.1366249,"Coffee & Tea, Food",4.0,1.59,0.7159,0.8364,0.7875,0.5,0.3,0.4,0.3,0.2509,0.315,0.15,35.05,44.0,20.95
+vdpxxb6fxjYtJMnW_V0GZg,Lucky Goat Coffeehouse,39.9725217939,-75.1792898199,"Food, Coffee & Tea",4.5,2.31,0.7051,0.9071,0.7073,0.5,0.3,0.4,0.3,0.2721,0.2829,0.15,38.6,40.13,21.27
+QqOKPUl7aNiW4IN_Ij2mBg,Café Bustelo,39.967345,-75.139348,"Food, Coffee & Tea",4.0,1.52,0.6949,0.7552,0.7958,0.5,0.3,0.4,0.3,0.2266,0.3183,0.15,32.61,45.81,21.59
+sD2yBIzp0SNYRMD4QfH9Jw,Starbucks,39.96651,-75.140377,"Food, Coffee & Tea",2.5,1.52,0.6948,0.7552,0.7956,0.5,0.3,0.4,0.3,0.2266,0.3182,0.15,32.61,45.8,21.59
+-QG6KSRQKTQ80--wqrnLTg,Starbucks,39.9521781257,-75.1608799489,"Food, Coffee & Tea",4.0,2.79,0.6933,0.9333,0.6581,0.5,0.3,0.4,0.3,0.28,0.2633,0.15,40.39,37.97,21.64
