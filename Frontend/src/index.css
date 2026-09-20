@@ -1,0 +1,18 @@
+/*
+ * Reset tối thiểu. Toàn bộ design token (màu/type/spacing) nằm ở
+ * App.css -- file này CHỈ giữ những gì mọi trang HTML nào cũng cần,
+ * không chứa token hay style riêng của POI-DSS.
+ *
+ * (Trước đây file này còn nguyên CSS mẫu của Vite template -- 1 hệ
+ * :root khác màu tím, ép #root rộng 1126px/text-align:center, ép
+ * font-size h1/h2 -- đã xoá vì đè lên token mới viết trong App.css.)
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
