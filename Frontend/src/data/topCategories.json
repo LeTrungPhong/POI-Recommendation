@@ -1,0 +1,122 @@
+[
+  {
+    "name": "Restaurants",
+    "business_count": 5852
+  },
+  {
+    "name": "Food",
+    "business_count": 3105
+  },
+  {
+    "name": "Shopping",
+    "business_count": 2091
+  },
+  {
+    "name": "Nightlife",
+    "business_count": 1463
+  },
+  {
+    "name": "Beauty & Spas",
+    "business_count": 1320
+  },
+  {
+    "name": "Bars",
+    "business_count": 1293
+  },
+  {
+    "name": "Home Services",
+    "business_count": 1150
+  },
+  {
+    "name": "Local Services",
+    "business_count": 1012
+  },
+  {
+    "name": "Health & Medical",
+    "business_count": 984
+  },
+  {
+    "name": "Sandwiches",
+    "business_count": 929
+  },
+  {
+    "name": "Coffee & Tea",
+    "business_count": 894
+  },
+  {
+    "name": "Event Planning & Services",
+    "business_count": 819
+  },
+  {
+    "name": "Pizza",
+    "business_count": 800
+  },
+  {
+    "name": "American (New)",
+    "business_count": 751
+  },
+  {
+    "name": "Breakfast & Brunch",
+    "business_count": 686
+  },
+  {
+    "name": "Automotive",
+    "business_count": 665
+  },
+  {
+    "name": "American (Traditional)",
+    "business_count": 663
+  },
+  {
+    "name": "Active Life",
+    "business_count": 643
+  },
+  {
+    "name": "Arts & Entertainment",
+    "business_count": 595
+  },
+  {
+    "name": "Fashion",
+    "business_count": 535
+  },
+  {
+    "name": "Hair Salons",
+    "business_count": 532
+  },
+  {
+    "name": "Italian",
+    "business_count": 505
+  },
+  {
+    "name": "Specialty Food",
+    "business_count": 482
+  },
+  {
+    "name": "Chinese",
+    "business_count": 471
+  },
+  {
+    "name": "Nail Salons",
+    "business_count": 395
+  },
+  {
+    "name": "Hotels & Travel",
+    "business_count": 392
+  },
+  {
+    "name": "Real Estate",
+    "business_count": 376
+  },
+  {
+    "name": "Professional Services",
+    "business_count": 375
+  },
+  {
+    "name": "Bakeries",
+    "business_count": 373
+  },
+  {
+    "name": "Fast Food",
+    "business_count": 367
+  }
+]

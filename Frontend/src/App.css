@@ -1,0 +1,690 @@
+/*
+ * Design token -- hệ thống màu/type/spacing dùng chung cho toàn bộ app,
+ * lấy cảm hứng từ bản đồ chuyên đề / công cụ đo đạc (subject: DSS phân
+ * tích địa lý-dữ liệu trên Yelp Philadelphia), không phải bộ màu SaaS
+ * chung chung. Mọi hex trong các rule bên dưới phải tham chiếu qua các
+ * biến này -- không viết hex trực tiếp trong CSS của từng component.
+ */
+:root {
+  /* Color -- 6 màu gốc có tên */
+  --color-ink: #1c2321; /* chữ chính */
+  --color-paper: #f3f4f1; /* nền trang (xám-lục lạnh, không phải kem ấm) */
+  --color-surface: #ffffff; /* nền panel/bảng/bản đồ */
+  --color-accent: #2b6777; /* xanh lam-lục đậm -- "mực bản đồ" */
+  --color-positive: #3f7d5c; /* rank/score tăng */
+  --color-negative: #b24c3e; /* rank/score giảm, marker được chọn */
+
+  --color-text: var(--color-ink);
+  --color-text-muted: #5b6360;
+  --color-border: #d8d5cc;
+  --color-accent-contrast: #ffffff;
+
+  --color-danger-bg: #f7e7e4;
+  --color-danger-border: #e3b7ad;
+  --color-info-bg: #e8eeec;
+  --color-info-border: #bfd2cd;
+  --color-warning-text: #8a5a24;
+
+  --color-map-search-point: var(--color-accent);
+  --color-map-marker-selected: var(--color-negative);
+
+  /* Typography */
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-body: 'Public Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Consolas, monospace;
+
+  --fs-h1: 1.75rem;
+  --fs-h2: 1.25rem;
+  --fs-h3: 1.05rem;
+  --fs-body: 0.95rem;
+  --fs-small: 0.8rem;
+  --fs-micro: 0.72rem;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  --line-height-body: 1.5;
+  --line-height-tight: 1.25;
+
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2.25rem;
+
+  /* Radius -- chỉ bo control tương tác, panel/section giữ góc vuông */
+  --radius-control: 4px;
+
+  /* Shadow -- chỉ dùng cho lớp nổi (dropdown/popover), không dùng cho panel */
+  --shadow-elevated: 0 4px 16px rgba(28, 35, 33, 0.14);
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---------- Layout tổng ---------- */
+
+.app-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-5);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--line-height-body);
+  color: var(--color-text);
+  background: var(--color-paper);
+  min-height: 100vh;
+}
+
+.app-header {
+  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.app-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-semibold);
+  margin: 0;
+}
+
+.app-header p {
+  color: var(--color-text-muted);
+  margin: 0;
+  font-size: var(--fs-small);
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* ---------- SearchPanel ---------- */
+
+.search-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.search-panel h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-semibold);
+  margin: 0 0 var(--space-1);
+}
+
+.field-row {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.field-row label,
+.field-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+}
+
+.search-panel input {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  font: inherit;
+  font-size: var(--fs-body);
+  color: var(--color-text);
+}
+
+.search-panel input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.field-hint {
+  margin: calc(-1 * var(--space-1)) 0 0;
+  font-size: var(--fs-micro);
+  color: var(--color-text-muted);
+}
+
+/* Selector dùng combinator ">" (con TRỰC TIẾP của form) -- cố tình,
+   không viết ".search-panel button" chung chung: Radix Checkbox.Root
+   và Select.Trigger cũng render ra thẻ <button> nhưng nằm sâu bên
+   trong .field-block, nếu style theo mọi <button> trong .search-panel
+   thì sẽ đè nhầm lên chúng (đã xảy ra thật, phải sửa lại). */
+.search-panel > button {
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-5);
+  border: none;
+  border-radius: var(--radius-control);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font: inherit;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.search-panel > button:hover:not(:disabled) {
+  background: #234f5c;
+}
+
+.search-panel > button:disabled {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* Radix Select (dropdown user_id) -- Radix chỉ cấp hành vi, toàn bộ
+   giao diện dưới đây là CSS tự viết, không dùng theme mặc định. */
+.select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  font: inherit;
+  font-size: var(--fs-body);
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.select-trigger:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.select-icon {
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+}
+
+.select-content {
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  box-shadow: var(--shadow-elevated);
+  z-index: 1100;
+}
+
+.select-viewport {
+  padding: var(--space-1);
+  max-height: 320px;
+}
+
+.select-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--fs-small);
+  color: var(--color-text);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  outline: none;
+}
+
+.select-item[data-highlighted] {
+  background: var(--color-info-bg);
+}
+
+.select-item-indicator {
+  color: var(--color-accent);
+  font-weight: var(--fw-semibold);
+}
+
+/* Radix Checkbox (category) */
+.category-checkbox-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  max-height: 150px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  padding: var(--space-3);
+  background: var(--color-surface);
+}
+
+.category-checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-regular);
+  color: var(--color-text);
+  flex-direction: row;
+  width: auto;
+  cursor: pointer;
+}
+
+.checkbox-root {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: var(--color-surface);
+  padding: 0;
+  cursor: pointer;
+}
+
+.checkbox-root[data-state='checked'] {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.checkbox-root:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+.checkbox-indicator {
+  color: var(--color-accent-contrast);
+  font-size: 11px;
+  line-height: 1;
+}
+
+/* ---------- WhatIfSliders ---------- */
+
+.whatif-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.whatif-sliders h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-semibold);
+  margin: 0;
+}
+
+.whatif-note {
+  margin: calc(-1 * var(--space-2)) 0 0;
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+  max-width: 60ch;
+}
+
+.slider-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.slider-label {
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Radix Slider */
+.slider-root {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 20px;
+  touch-action: none;
+}
+
+.slider-track {
+  position: relative;
+  flex-grow: 1;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: 2px;
+}
+
+.slider-range {
+  position: absolute;
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 2px;
+}
+
+.slider-thumb {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-accent);
+  border-radius: 50%;
+  cursor: grab;
+  transition: box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.slider-thumb:hover {
+  box-shadow: 0 0 0 6px rgba(43, 103, 119, 0.12);
+}
+
+.slider-thumb:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 6px rgba(43, 103, 119, 0.2);
+}
+
+.whatif-hint {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--color-warning-text);
+}
+
+/* ---------- Banner trạng thái ---------- */
+
+.error-banner {
+  color: var(--color-negative);
+  background: var(--color-danger-bg);
+  border: 1px solid var(--color-danger-border);
+  border-radius: var(--radius-control);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--fs-small);
+}
+
+.loading-banner {
+  color: var(--color-accent);
+  background: var(--color-info-bg);
+  border: 1px solid var(--color-info-border);
+  border-radius: var(--radius-control);
+  padding: var(--space-2) var(--space-3);
+  margin: 0;
+  font-size: var(--fs-small);
+}
+
+.empty-state {
+  color: var(--color-text-muted);
+  font-size: var(--fs-small);
+}
+
+/* ---------- Map + bảng kết quả ---------- */
+
+.map-and-table {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  align-items: flex-start;
+}
+
+.map-view {
+  flex: 1 1 420px;
+  height: 450px;
+  border: 1px solid var(--color-border);
+}
+
+.results-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  flex: 1 1 420px;
+  min-width: 0;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  /* .table-scroll cũng là 1 flex item (cha .results-panel là flex
+     column) -- flex item mặc định min-width:auto (co không nhỏ hơn
+     nội dung bên trong), nên dù có overflow-x:auto vẫn bị bảng rộng
+     đẩy tràn ra ngoài viewport nếu không ép min-width:0 ở chính nó
+     (không chỉ ở .results-panel). Đây là bug thật gặp khi test mobile
+     375px, không phải suy đoán trước. */
+  min-width: 0;
+}
+
+.ranking-table,
+.changes-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+}
+
+.ranking-table th,
+.ranking-table td,
+.changes-table th,
+.changes-table td {
+  text-align: left;
+  padding: var(--space-2) var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+
+.ranking-table th,
+.changes-table th {
+  font-weight: var(--fw-medium);
+  color: var(--color-text-muted);
+  font-size: var(--fs-micro);
+}
+
+.ranking-table td.col-rank {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+
+.ranking-table td:nth-child(2),
+.changes-table td:first-child {
+  white-space: normal;
+}
+
+.col-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.col-score {
+  color: var(--color-accent);
+  font-weight: var(--fw-medium);
+}
+
+.ranking-table tbody tr,
+.changes-table tbody tr {
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.changes-table tbody tr {
+  cursor: default;
+}
+
+.ranking-table tbody tr:hover {
+  background: var(--color-info-bg);
+}
+
+.ranking-table tr.selected-row {
+  background: var(--color-info-bg);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+.business-name {
+  font-weight: var(--fw-medium);
+  white-space: normal;
+}
+
+.business-categories {
+  font-size: var(--fs-micro);
+  color: var(--color-text-muted);
+  white-space: normal;
+}
+
+.changes-table-wrapper {
+  /* Cũng là flex item của .results-panel (flex column) -- cần
+     min-width:0 vì lý do y hệt .table-scroll ở trên. */
+  min-width: 0;
+}
+
+.changes-table-wrapper h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+  margin: 0 0 var(--space-2);
+}
+
+.delta-positive {
+  color: var(--color-positive);
+  font-weight: var(--fw-semibold);
+}
+
+.delta-negative {
+  color: var(--color-negative);
+  font-weight: var(--fw-semibold);
+}
+
+/* ---------- ExplainPanel ---------- */
+
+.explain-panel {
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-4);
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.explain-panel-empty {
+  border-left-color: var(--color-border);
+  background: transparent;
+  padding: var(--space-3) var(--space-4);
+}
+
+.explain-panel-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+  margin: 0;
+}
+
+.explain-status {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+}
+
+/* "1 điểm nhấn duy nhất" -- tổng điểm là con số quan trọng nhất trong
+   panel này, cố tình cho to + màu accent + mono, mọi thứ khác trong
+   panel giữ trầm. */
+.total-score {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.total-score-label {
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+}
+
+.total-score-value {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: var(--fw-semibold);
+  color: var(--color-accent);
+}
+
+.breakdown-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.breakdown-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-small);
+}
+
+.breakdown-pct {
+  font-family: var(--font-mono);
+}
+
+.breakdown-bar-track {
+  background: var(--color-border);
+  height: 6px;
+  overflow: hidden;
+}
+
+.breakdown-bar-fill {
+  background: var(--color-accent);
+  height: 100%;
+}
+
+.breakdown-raw {
+  font-size: var(--fs-micro);
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+}
+
+.distance-note {
+  font-size: var(--fs-small);
+  color: var(--color-text-muted);
+  margin: var(--space-1) 0 0;
+}
+
+/* ---------- Responsive: mobile ~480px trở xuống ---------- */
+
+@media (max-width: 480px) {
+  .app-layout {
+    padding: var(--space-3);
+  }
+
+  .field-row {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .map-and-table {
+    flex-direction: column;
+    /* Ở desktop, "align-items: flex-start" (khai báo trong rule gốc
+       .map-and-table) chỉ có nghĩa "căn theo mép trên" vì đó là trục
+       chéo của layout hàng ngang. Khi đổi sang flex-direction:column,
+       trục chéo trở thành chiều NGANG -- cùng khai báo đó vô tình biến
+       thành "không kéo giãn item theo chiều ngang", khiến map-view/
+       results-panel co lại theo nội dung (bảng rộng) thay vì theo
+       chiều rộng container -- đây là bug thật gặp khi test mobile
+       375px, không phải suy đoán trước. Ép lại stretch cho đúng ý ở
+       chế độ cột. */
+    align-items: stretch;
+    /* Rule gốc còn "flex-wrap: wrap" (để MapView/RankingTable tự xuống
+       hàng ở màn hẹp hơn khi còn flex-direction:row) -- với
+       flex-direction:column, wrap lại biến thành xếp nhiều CỘT cạnh
+       nhau thay vì xếp chồng 1 cột dọc (đây chính là nguồn tràn ngang
+       thật sự, không phải min-width). Ép về 1 cột duy nhất. */
+    flex-wrap: nowrap;
+  }
+
+  .map-view {
+    height: 320px;
+    width: 100%;
+  }
+}
