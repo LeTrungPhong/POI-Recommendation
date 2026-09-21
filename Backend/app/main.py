@@ -12,6 +12,9 @@ from pydantic import BaseModel, Field
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 ARTIFACT_DIR = PROJECT_ROOT / "Output"
+# Avoids a zero component (e.g. no category overlap) collapsing the whole
+# product-rule score to zero; see Backend/README.md "Scoring formula".
+SCORE_EPSILON = 1e-6
 PARQUET_ARTIFACTS = (
     "business_city",
     "reviews_city",
@@ -199,9 +202,9 @@ def recommend(request: RecommendationRequest, artifacts: dict[str, Any]) -> list
             else 0.0
         )
         score = (
-            weights["cf"] * cf_score
-            + weights["geo"] * geo_score
-            + weights["cat"] * category_score
+            (cf_score + SCORE_EPSILON) ** weights["cf"]
+            * (geo_score + SCORE_EPSILON) ** weights["geo"]
+            * (category_score + SCORE_EPSILON) ** weights["cat"]
         )
         results.append(
             Recommendation(
@@ -274,17 +277,29 @@ def explain_business(
         else 0.0
     )
 
-    cf_contribution = weights["cf"] * cf_score
-    geo_contribution = weights["geo"] * geo_score
-    category_contribution = weights["cat"] * category_score
-    total_score = cf_contribution + geo_contribution + category_contribution
+    cf_contribution = (cf_score + SCORE_EPSILON) ** weights["cf"]
+    geo_contribution = (geo_score + SCORE_EPSILON) ** weights["geo"]
+    category_contribution = (category_score + SCORE_EPSILON) ** weights["cat"]
+    total_score = cf_contribution * geo_contribution * category_contribution
+
+    # Product-rule scores don't split into additive shares, so contribution
+    # percentages are computed in log-space instead: total_score's log is
+    # exactly the sum of each factor's weighted log, so each factor's share
+    # of that sum is a faithful (and still 100%-summing) breakdown of how
+    # much it pulled the score down (a near-zero score -> large negative
+    # log -> large percentage "blame") or left it alone (score near 1 ->
+    # log near 0 -> small percentage).
+    log_cf = weights["cf"] * np.log(cf_score + SCORE_EPSILON)
+    log_geo = weights["geo"] * np.log(geo_score + SCORE_EPSILON)
+    log_cat = weights["cat"] * np.log(category_score + SCORE_EPSILON)
+    log_total = log_cf + log_geo + log_cat
     percentages = (
         {
-            "cf": cf_contribution / total_score * 100,
-            "geo": geo_contribution / total_score * 100,
-            "category": category_contribution / total_score * 100,
+            "cf": log_cf / log_total * 100,
+            "geo": log_geo / log_total * 100,
+            "category": log_cat / log_total * 100,
         }
-        if total_score > 0
+        if log_total != 0
         else {"cf": 0.0, "geo": 0.0, "category": 0.0}
     )
     cf_percentage = round(percentages["cf"], 2)

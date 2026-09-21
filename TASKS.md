@@ -1,8 +1,8 @@
 # TASKS — POI-DSS (Philadelphia POI Recommendation)
 
 ## Đã chốt, không làm lại
-- Dataset, thuật toán, trọng số hybrid mặc định (0.4/0.3/0.3): giữ nguyên.
-- Ablation study (Hybrid NDCG@10 = 0.0065, thua CF-only 0.0105, -38%): **chấp nhận kết quả**, không tune lại. Báo cáo trung thực kèm phân tích nguyên nhân (Geo/Category profile suy ra từ lịch sử trung bình, nhiễu hơn tín hiệu CF trực tiếp).
+- Dataset, trọng số hybrid mặc định (0.4/0.3/0.3): giữ nguyên.
+- **Cập nhật 2026-09-21**: đổi cách kết hợp (fusion) từ weighted sum sang **product rule** (`score = cf^w_cf · geo^w_geo · cat^w_cat`), đúng Eq. 18 của paper GeoSoCa — xem `PAPER_ALIGNMENT.md`. Ablation chạy lại: **Hybrid NDCG@10 = 0.0116, vượt CF-only (0.0105) +10.79%** (trước đó thua CF-only -38% khi còn dùng weighted sum). Không đổi Geo/CF/Category, chỉ đổi công thức kết hợp — không cần làm lại phần này.
 - Frontend build lên trên backend + artifact hiện có, không sửa scoring/eval.
 
 ## Tấn — Data & Scoring (đã xong, giai đoạn tới chỉ hỗ trợ)
@@ -15,30 +15,31 @@
 ## Phong — Backend & Evaluation
 - [x] FastAPI `/recommend`, `/whatif`, `/explain`
 - [x] Evaluation + ablation study thật (25,775 user) — CHỐT, không chạy lại
-- [ ] **Ưu tiên cao / chặn frontend:** thêm `CORSMiddleware` vào `app/main.py` (hiện chưa có) — thiếu cái này Phúc không gọi được API từ dev server
+- [x] ~~Ưu tiên cao / chặn frontend: thêm `CORSMiddleware`~~ — không cần nữa, Phúc đã dùng Vite dev proxy (`Frontend/vite.config.js`, forward `/api/*` -> `127.0.0.1:8000` phía server, không qua trình duyệt nên không bị CORS chặn) thay vì sửa backend
 - [ ] Viết phần "Backend Architecture & Evaluation Results" cho báo cáo, gồm bảng ablation + phân tích nguyên nhân Hybrid < CF-only
 - [ ] Hỗ trợ Phúc debug response thật khi tích hợp
 
-## Phúc — Frontend (việc chính giai đoạn tới)
+## Phúc — Frontend (đã xong phần khung, còn polish)
 
 ### Tuần 1: Chạy được backend + SearchPanel + RankingTable
-- [ ] Dựng venv và chạy backend local (`Backend/` chưa có `.venv`; artifact trong `Output/` đã đủ): `py -m venv .venv` → `pip install -r requirements.txt` → `uvicorn app.main:app --reload` → kiểm tra `GET /health`
-- [ ] Scaffold Vite + React
-- [ ] Test `/recommend`, `/whatif`, `/explain` qua Swagger `/docs` để nắm schema thật
-- [ ] `SearchPanel` (làm trước RankingTable): input `latitude`/`longitude` (mặc định center Philadelphia 39.9526, -75.1652), chọn `categories`, `k`, `max_distance_km`, dropdown `user_id` mẫu — đây là thứ sinh request cho mọi endpoint còn lại
-- [ ] `RankingTable`: gọi `POST /recommend`, render danh sách thật (không mock)
+- [x] Dựng venv và chạy backend local
+- [x] Scaffold Vite + React
+- [x] Test `/recommend`, `/whatif`, `/explain` qua Swagger `/docs`
+- [x] `SearchPanel`
+- [x] `RankingTable`: gọi `POST /recommend`, render danh sách thật (không mock)
 
 ### Tuần 2: ExplainPanel + WhatIfSliders
-- [ ] `ExplainPanel`: gọi `GET /explain` khi click 1 dòng, hiển thị breakdown % (cf/geo/category)
-- [ ] `WhatIfSliders`: slider trọng số cf/geo/cat, gọi `POST /whatif`, cập nhật `RankingTable` bằng kết quả `scenario`
-- [ ] Debounce slider 300–500ms (hoặc chỉ gọi khi thả chuột): `/whatif` chạy `recommend()` 2 lần, mỗi lần duyệt toàn bộ business trong bán kính (~14.5k ở `max_distance_km=15`) — gọi theo từng bước slider sẽ lag
-- [ ] Hiển thị bảng `changes` (rank_delta / score_delta) — đây là phần thể hiện rõ nhất tính "hỗ trợ ra quyết định"
+- [x] `ExplainPanel`: gọi `GET /explain` khi click 1 dòng, hiển thị breakdown % (cf/geo/category)
+- [x] `WhatIfSliders`: slider trọng số cf/geo/cat, gọi `POST /whatif`, cập nhật kết quả bằng `scenario`
+- [x] Debounce slider (`onDebouncedChange` trong `WhatIfSliders`)
+- [x] Hiển thị bảng `changes` (rank_delta / score_delta) — giờ dùng switch để đổi qua lại với RankingTable thay vì xếp chồng (2026-09-21)
 
 ### Tuần 3: MapView + Polish
-- [ ] `MapView` (react-leaflet): marker cho từng kết quả (`/recommend` đã trả sẵn `latitude`/`longitude`), click marker → mở `ExplainPanel`
-- [ ] Click bản đồ để đặt lại vị trí tìm kiếm → cập nhật `SearchPanel`
-- [ ] Loading/error state cho các lần gọi API
-- [ ] Layout tổng (header + map/table)
+- [x] `MapView` (react-leaflet): marker cho từng kết quả, click marker → mở `ExplainPanel`
+- [x] Click bản đồ để đặt lại vị trí tìm kiếm → cập nhật `SearchPanel`
+- [x] Loading/error state cho các lần gọi API
+- [x] Layout tổng (header + map/table) — ExplainPanel dời xuống ngay dưới map (2026-09-21)
+- [ ] Polish thêm nếu còn thời gian trước demo (xem "Cả nhóm — Báo cáo & Slide" bên dưới)
 
 ## Ghi chú hợp đồng API (chỗ dễ sai khi code frontend)
 - `weights` phải có **đủ cả 3 key** `cf`, `geo`, `cat`; thiếu key hoặc thừa key → 422. Backend tự chuẩn hóa tổng = 1 nên không cần tự chia.

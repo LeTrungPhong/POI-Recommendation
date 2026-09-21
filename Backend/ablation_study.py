@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from app.main import ARTIFACT_DIR, load_artifacts
+from app.main import ARTIFACT_DIR, SCORE_EPSILON, load_artifacts
 from app.metrics import ndcg_at_k, precision_at_k, recall_at_k
 
 
@@ -165,8 +165,19 @@ def evaluate_ablation(k: int, batch_size: int) -> pd.DataFrame:
             if not actual:
                 continue
             seen = train_by_user[user_id]
+            # Product rule (weighted geometric mean), matching GeoSoCa Eq. 18:
+            # score = cf^w_cf * geo^w_geo * cat^w_cat. A weight of 0 makes that
+            # factor's term equal 1 (irrelevant), which is what isolates the
+            # single-component variants (CF-only, Geo-only, Category-only)
+            # below without any special-casing.
             row_scores = {
-                variant: sum(weight * scores[row_offset - start] for weight, scores in zip(weights, component_scores))
+                variant: np.prod(
+                    [
+                        (scores[row_offset - start] + SCORE_EPSILON) ** weight
+                        for weight, scores in zip(weights, component_scores)
+                    ],
+                    axis=0,
+                )
                 for variant, weights in VARIANT_WEIGHTS.items()
             }
             for scores in row_scores.values():

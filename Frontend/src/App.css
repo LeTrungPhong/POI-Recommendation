@@ -435,8 +435,19 @@
   align-items: flex-start;
 }
 
-.map-view {
+.map-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
   flex: 1 1 420px;
+  min-width: 0;
+}
+
+.map-view {
+  /* Không cần "flex: 1 1 420px" nữa -- .map-column (flex column, cha
+     trực tiếp) đã stretch nó full-width theo mặc định (align-items:
+     stretch của flex container), .map-view chỉ còn cần tự set chiều
+     cao cố định. */
   height: 450px;
   border: 1px solid var(--color-border);
 }
@@ -447,6 +458,39 @@
   gap: var(--space-4);
   flex: 1 1 420px;
   min-width: 0;
+}
+
+.results-view-switch {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  align-self: flex-start;
+}
+
+.results-view-switch button {
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--radius-control) - 1px);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.results-view-switch button:hover {
+  color: var(--color-text);
+}
+
+.results-view-switch button.active {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
 }
 
 .table-scroll {

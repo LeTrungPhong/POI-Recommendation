@@ -41,6 +41,12 @@ function App() {
   const [whatIfError, setWhatIfError] = useState(null)
   const [effectiveWeights, setEffectiveWeights] = useState(DEFAULT_WEIGHTS)
 
+  // Bảng ranking và bảng "thay đổi so với baseline" giờ dùng chung 1 vị
+  // trí, đổi qua lại bằng switch thay vì xếp chồng (trước đây phải kéo
+  // xuống mới thấy hết bảng changes). 'changes' chỉ có ý nghĩa khi đã
+  // có whatIfResult -- xem resultsView đọc ở JSX bên dưới.
+  const [resultsView, setResultsView] = useState('ranking')
+
   async function handleSearch(params) {
     setIsLoading(true)
     setError(null)
@@ -51,6 +57,7 @@ function App() {
       setSelectedBusiness(null)
       setWhatIfResult(null)
       setEffectiveWeights(DEFAULT_WEIGHTS)
+      setResultsView('ranking')
     } catch (err) {
       setError(err.message)
       setResults([])
@@ -125,33 +132,59 @@ function App() {
         {isLoading && <p className="loading-banner">Đang tìm kiếm...</p>}
 
         <div className="map-and-table">
-          <MapView
-            results={displayedResults}
-            center={{ latitude, longitude }}
-            selectedBusinessId={selectedBusiness?.business_id}
-            onSelectBusiness={setSelectedBusiness}
-            onMapClick={handleMapClick}
-          />
+          <div className="map-column">
+            <MapView
+              results={displayedResults}
+              center={{ latitude, longitude }}
+              selectedBusinessId={selectedBusiness?.business_id}
+              onSelectBusiness={setSelectedBusiness}
+              onMapClick={handleMapClick}
+            />
+
+            {lastSearchParams && (
+              <ExplainPanel
+                business={selectedBusiness}
+                searchContext={lastSearchParams}
+                weights={effectiveWeights}
+              />
+            )}
+          </div>
 
           <div className="results-panel">
-            <RankingTable
-              results={displayedResults}
-              onSelect={setSelectedBusiness}
-              selectedBusinessId={selectedBusiness?.business_id}
-            />
             {whatIfResult && (
+              <div className="results-view-switch" role="tablist" aria-label="Chọn bảng hiển thị">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={resultsView === 'ranking'}
+                  className={resultsView === 'ranking' ? 'active' : ''}
+                  onClick={() => setResultsView('ranking')}
+                >
+                  Ranking
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={resultsView === 'changes'}
+                  className={resultsView === 'changes' ? 'active' : ''}
+                  onClick={() => setResultsView('changes')}
+                >
+                  So sánh với baseline
+                </button>
+              </div>
+            )}
+
+            {resultsView === 'changes' && whatIfResult ? (
               <ChangesTable changes={whatIfResult.changes} nameById={nameById} />
+            ) : (
+              <RankingTable
+                results={displayedResults}
+                onSelect={setSelectedBusiness}
+                selectedBusinessId={selectedBusiness?.business_id}
+              />
             )}
           </div>
         </div>
-
-        {lastSearchParams && (
-          <ExplainPanel
-            business={selectedBusiness}
-            searchContext={lastSearchParams}
-            weights={effectiveWeights}
-          />
-        )}
       </main>
     </div>
   )
